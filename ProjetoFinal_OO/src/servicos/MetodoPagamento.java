@@ -1,7 +1,8 @@
 package servicos;
 
+import excecoes.PagamentoRecusadoException;
+import excecoes.SaldoInsuficienteException;
+
 public interface MetodoPagamento {
-	public default boolean processarPagamento(double saldo) {
-		return false;
-	}
+    boolean processarPagamento(double valor) throws PagamentoRecusadoException, SaldoInsuficienteException;
 }
