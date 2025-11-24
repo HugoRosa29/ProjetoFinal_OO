@@ -4,5 +4,5 @@ import excecoes.PagamentoRecusadoException;
 import excecoes.SaldoInsuficienteException;
 
 public interface MetodoPagamento {
-    boolean processarPagamento(double valor) throws PagamentoRecusadoException, SaldoInsuficienteException;
+    public boolean processarPagamento(double valor) throws SaldoInsuficienteException, PagamentoRecusadoException;
 }

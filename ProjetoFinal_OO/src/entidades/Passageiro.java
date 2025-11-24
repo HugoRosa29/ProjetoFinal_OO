@@ -7,8 +7,8 @@ import servicos.MetodoPagamento;
 public class Passageiro extends Usuario{
 	private List<MetodoPagamento> metodosPagamento = new ArrayList<>();
 
-	public Passageiro(String nome, String cpf, String senha, String email) {
-		super(nome, cpf, senha, email);
+	public Passageiro(String nome, String cpf, String senha, String email, String telefone) {
+		super(nome, cpf, senha, email, telefone);
 	
 	}
 	
@@ -16,8 +16,8 @@ public class Passageiro extends Usuario{
         this.metodosPagamento.add(metodo);
     }
 	
-	public MetodoPagamento getMetodoPagamentoPadrao() {
-        return metodosPagamento.isEmpty() ? null : metodosPagamento.get(0);
-	}
+	public MetodoPagamento getMetodoPagamento(int index) {
+		return metodosPagamento.get(index);
+		}
 	
 }

@@ -6,9 +6,9 @@ public class Motorista extends Usuario {
 	private StatusMotorista status;
 	private Veiculo veiculo;
 	
-	public Motorista(String nome, String cpf, String senha, String email, int cnh, Veiculo veiculo, StatusMotorista status) {
-		super(nome, cpf, senha, email);
-		this.cnh = cnh;
+	public Motorista(String nome, String cpf, String senha, String email, String telefone, int cnh, Veiculo veiculo, StatusMotorista status) {
+		super(nome, cpf, senha, email, telefone);
+		this.setCnh(cnh);
 		this.veiculo = veiculo;
 		this.status = status;
 	}
@@ -25,5 +25,7 @@ public class Motorista extends Usuario {
 	public StatusMotorista getStatus() {return status;}
     public Veiculo getVeiculo() {return veiculo;}
     public void setStatus(StatusMotorista status) {this.status = status;}
+	public int getCnh() {return cnh;}
+	public void setCnh(int cnh) {this.cnh = cnh;}
 	
 }
