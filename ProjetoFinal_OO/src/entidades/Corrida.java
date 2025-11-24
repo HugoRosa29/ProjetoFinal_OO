@@ -17,7 +17,7 @@ public class Corrida  {
 	    
 	    
 	     public double calcularPrecoEstimado() {
-	    	
+	    	return o.o;
 	    }
 	    
 
