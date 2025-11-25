@@ -1,7 +1,7 @@
 package entidades;
 
 public enum StatusCorrida {
-	SOLICITADA,
+    SOLICITADA,
     ACEITA,
     EM_ANDAMENTO,
     FINALIZADA,

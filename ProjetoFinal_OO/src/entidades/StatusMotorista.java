@@ -1,7 +1,7 @@
 package entidades;
 
 public enum StatusMotorista {
-	ONLINE,
+    ONLINE,
     OFFLINE,
     EM_CORRIDA;
 }

@@ -1,23 +1,27 @@
 package entidades;
 
 public class Local {
-protected Double latitude;
-protected Double longitude;
-protected String endereco;
+    private String localPartida, localDestino;
+    private double distancia;
 
-public Local(Double latitude, Double longitude, String endereco) {
-	this.endereco = endereco;
-	this.latitude = latitude;
-	this.longitude = longitude;
-	
-}
+    public Local(String localPartida, String localDestino, double distancia) {
+        this.localPartida = localPartida;
+        this.localDestino = localDestino;
+        this.distancia = distancia;
 
+    }
 
+    public String getLocalPartida() {return localPartida;}
 
-public double calcularDistancia() {
-	
-}
+    public String getLocalDestino() {return localDestino;}
 
+    public Double getDistancia() {return distancia;}
+
+    public void setLocalPartida(String localPartida) {this.localPartida = localPartida;}
+
+    public void setLocalDestino(String localDestino) {this.localDestino = localDestino;}
+
+    public void setDistancia(double distancia) {this.distancia = distancia;}
 
 
 }

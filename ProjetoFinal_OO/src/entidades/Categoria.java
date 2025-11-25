@@ -1,17 +1,26 @@
 package entidades;
 
-public enum Categoria {
-    COMUM(5.0, 1.0),
-    LUXO(9.0, 2.2);
+public class Categoria {
 
-    private double tarifaBase;
-    private double precoPorKm;
+    private double tarifaBase, precoPorKm;
 
-    Categoria(double tarifaBase, double precoPorKm) {
+
+    public Categoria(double tarifaBase, double precoPorKm) {
         this.tarifaBase = tarifaBase;
         this.precoPorKm = precoPorKm;
     }
 
-    public double tarifaBase() { return tarifaBase; }
-    public double precoPorKm() { return precoPorKm; }
+
+    public double getTarifaBase() {return tarifaBase;}
+
+    public double getPrecoPorKm() {return precoPorKm;}
+
+
+
+    public static final Categoria comum = new Categoria(5.0, 1.0);
+    public static final Categoria luxo = new Categoria(9.0, 2.2);
+
+
 }
+
+
