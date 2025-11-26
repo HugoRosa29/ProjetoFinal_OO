@@ -3,7 +3,6 @@ import servicos.MetodoPagamento;
 
 
 public class Corrida  {
-    private String id;
     private Passageiro passageiro;
     private Motorista motorista;
     private StatusCorrida status;

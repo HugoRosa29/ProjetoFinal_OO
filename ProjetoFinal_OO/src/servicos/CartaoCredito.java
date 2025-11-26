@@ -49,3 +49,4 @@ public class CartaoCredito implements MetodoPagamento{
 
     public String getNumeroCartao() {return numeroCartao;}
     public void setNumeroCartao(String numeroCartao) {this.numeroCartao = numeroCartao;}
+}

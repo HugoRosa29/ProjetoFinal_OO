@@ -14,6 +14,24 @@ public class Veiculo {
         this.ano = ano;
         this.categoria = categoria;
     }
+
+
+    public int getAno() {
+        return ano;
+    }
+
+    public void setAno(int ano) {
+        this.ano = ano;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
 }
 
 
