@@ -87,6 +87,8 @@ public class Main {
             System.out.println("[OK] Motorista atribuído automaticamente: "
                     + corrida.getMotorista().getNome()
                     + " | Veículo: " + corrida.getMotorista().getVeiculo().getModelo()
+                    + " | Placa: "
+                    + corrida.getMotorista().getVeiculo().getPlaca()
                     + "\n");
 
 
