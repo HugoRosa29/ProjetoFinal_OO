@@ -12,6 +12,7 @@ public class Motorista extends Usuario {
         super(nome, cpf, senha, email, telefone);
         this.cnh = cnh;
         this.veiculo = veiculo;
+        this.status = StatusMotorista.OFFLINE;
     }
 
     public void ficarOnline() throws MotoristaInvalidoException {
