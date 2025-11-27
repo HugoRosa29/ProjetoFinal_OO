@@ -1,4 +1,7 @@
 package entidades;
+import excecoes.EstadoInvalidoDaCorridaException;
+import excecoes.PagamentoRecusadoException;
+import excecoes.SaldoInsuficienteException;
 import servicos.MetodoPagamento;
 
 
@@ -9,22 +12,99 @@ public class Corrida  {
     private double precoFinal;
     private MetodoPagamento metodoPagamento;
     private Categoria categoria;
-    private Local partida;
-    private Local destino;
+    private String partida;
+    private String destino;
     private double distancia;
     private double precoEstimado;
 
-    public Corrida(Local partida, Local destino, Categoria categoria) {
+    public Corrida(Passageiro passageiro, String partida, String destino, double distancia, Categoria categoria) {
         this.categoria = categoria;
-        this.distancia = partida.getDistancia();
+        this.distancia = distancia;
         this.partida = partida;
         this.destino = destino;
+        this.precoEstimado = categoria.calcularPreco(distancia);
+        this.status = StatusCorrida.SOLICITADA;
+    }
+
+    public void setMetodoPagamento(MetodoPagamento forma) {
+        this.metodoPagamento = forma;
+    }
+
+    public void atribuirMotorista(Motorista motorista) throws EstadoInvalidoDaCorridaException{
+        if (this.status != StatusCorrida.SOLICITADA) {
+            throw new EstadoInvalidoDaCorridaException("Só é possível atribuir um motorista a uma corrida que está SOLICITADA.");
+        }
+        this.motorista = motorista;
+        this.status = StatusCorrida.ACEITA;
+    }
+
+    public void iniciarCorrida() throws EstadoInvalidoDaCorridaException {
+        if (this.status != StatusCorrida.ACEITA) {
+            throw new EstadoInvalidoDaCorridaException("Só é possível iniciar viagem quando ACEITA");
+        }
+        this.status = StatusCorrida.EM_ANDAMENTO;
+        if (motorista != null){
+            try {
+                motorista.setStatus(StatusMotorista.EM_CORRIDA);
+            } catch (Exception e) {
+                System.out.println("Erro ao atualizar status do motorista: " + e.getMessage());
+            }
+        }
+        System.out.println("Corrida iniciada de " + partida + " para " + destino + ".");
+    }
+
+    public void finalizarCorrida() throws EstadoInvalidoDaCorridaException {
+        if (this.status != StatusCorrida.EM_ANDAMENTO) {
+            throw new EstadoInvalidoDaCorridaException("Só é possível finalizar uma corrida que está EM ANDAMENTO.");
+        }
+        this.status = StatusCorrida.FINALIZADA;
+        this.precoFinal = categoria.calcularPreco(distancia);
+        if (motorista != null){
+            try {
+                motorista.setStatus(StatusMotorista.ONLINE);
+            } catch (Exception e) {
+                System.out.println("Erro ao atualizar status do motorista: " + e.getMessage());
+            }
+        }
+        System.out.println("Corrida finalizada. Preço final: R$" + precoFinal);
+    }
+
+    public void cancelar() throws EstadoInvalidoDaCorridaException {
+        if (this.status == StatusCorrida.FINALIZADA || this.status == StatusCorrida.CANCELADA) {
+            throw new EstadoInvalidoDaCorridaException("Não é possível cancelar uma corrida que já foi FINALIZADA ou CANCELADA.");
+        }
+        this.status = StatusCorrida.CANCELADA;
+        if (motorista != null){
+            try {
+                motorista.setStatus(StatusMotorista.ONLINE);
+            } catch (Exception e) {
+                System.out.println("Erro ao atualizar status do motorista: " + e.getMessage());
+            }
+        }
+        System.out.println("Corrida cancelada.");
+    }
+
+    public void processarPagamento() throws SaldoInsuficienteException, EstadoInvalidoDaCorridaException, PagamentoRecusadoException {
+        if (this.status != StatusCorrida.FINALIZADA) {
+            throw new EstadoInvalidoDaCorridaException("Só é possível processar pagamento de uma corrida FINALIZADA.");
+        }
+        try{
+            metodoPagamento.processarPagamento(precoEstimado, passageiro);
+        } catch (SaldoInsuficienteException | PagamentoRecusadoException e){
+            this.status = StatusCorrida.PENDENTE_PAGAMENTO;
+            throw e;
+        }
+        System.out.println("Pagamento de R$" + precoFinal + " processado via " + metodoPagamento.getTipoPagamento() + ".");
     }
 
 
-
-    public double calcularCorrida() {
-        return categoria.getTarifaBase() + categoria.getPrecoPorKm() * distancia;
-    }
+    public double getValorEstimado() { return precoEstimado; }
+    public Passageiro getPassageiro() { return passageiro; }
+    public Motorista getMotorista() { return motorista; }
+    public StatusCorrida getStatus() { return status; }
+    public Categoria getCategoria() { return categoria; }
+    public double getDistanciaKm() { return distancia; }
+    public String getOrigem() { return partida; }
+    public String getDestino() { return destino; }
 
 }

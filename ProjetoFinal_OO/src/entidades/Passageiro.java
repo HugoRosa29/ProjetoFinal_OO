@@ -2,6 +2,8 @@ package entidades;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import excecoes.PassageiroPendenteException;
 import servicos.MetodoPagamento;
 
 public class Passageiro extends Usuario{
@@ -11,10 +13,15 @@ public class Passageiro extends Usuario{
         super(nome, cpf, senha, email, telefone);
     }
 
-    public Corrida solicitarCorrida(Local partida, Local destino, Categoria categoria) {
-        return new Corrida(partida, destino, categoria);
+    public Corrida solicitarCorrida(Passageiro passageiro, String partida, String destino,double distancia, Categoria categoria) {
+        return new Corrida(passageiro, partida, destino, distancia, categoria);
     }
 
+    public void checarPodeSolicitarCorrida() throws PassageiroPendenteException {
+        if (metodosPagamento.isEmpty()) {
+            throw new PassageiroPendenteException("Passageiro precisa adicionar um método de pagamento antes de solicitar uma corrida.");
+        }
+    }
 
     public void adicionarMetodoPagamento(MetodoPagamento metodo) {
         this.metodosPagamento.add(metodo);
