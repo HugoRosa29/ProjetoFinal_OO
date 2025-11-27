@@ -27,7 +27,7 @@ public class Main {
             motoristas.add(m1);
 
             Veiculo v2 = new Veiculo("XYZ-0000","Corolla", "Preto", 2023, 
-                    new CategoriaComum());
+                    new CategoriaLuxo());
             Motorista m2 = new Motorista("Marcos Sena", "999.333.111-22", "senha456",
                     "marcos@email.com", "61999995555", "1234567", v2);
             m2.setStatus(StatusMotorista.ONLINE);
@@ -72,7 +72,7 @@ public class Main {
                     "UnB ICC Sul",
                     "Shopping Iguatemi",
                     12.5,
-                    new CategoriaComum()
+                    new CategoriaLuxo()
             );
 
             System.out.println("Corrida solicitada: " + corrida);
