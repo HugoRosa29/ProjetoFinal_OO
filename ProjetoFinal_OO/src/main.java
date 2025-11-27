@@ -1,79 +1,151 @@
 
-import entidades.CategoriaComum;
-import entidades.Corrida;
-import entidades.Motorista;
-import entidades.Passageiro;
-import entidades.StatusMotorista;
-import entidades.Veiculo;
-import excecoes.EstadoInvalidoDaCorridaException;
-import excecoes.PagamentoRecusadoException;
-import excecoes.PassageiroPendenteException;
-import excecoes.SaldoInsuficienteException;
-import servicos.CartaoCredito;
-import servicos.MetodoPagamento;
-import servicos.Pix;
+import entidades.*;
+import excecoes.*;
+import servicos.*;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class main {
+public class Main {
+
     public static void main(String[] args) {
-        System.out.println("Projeto Final de Orientação a Objetos");
-         // criar passageiros
-        Passageiro passageiro = new Passageiro("Ana Silva", "11122233344", "ana@ex.com", "8199999", "senha");
-        // adicionar uma forma de pagamento (cartão que termina com 1 -> normalmente aprovado)
-        passageiro.adicionarMetodoPagamento(new CartaoCredito("1234567890123451", "VISA", "12/27", "123"));
-        // adicionar uma forma de pagamento PIX
-        passageiro.adicionarMetodoPagamento(new Pix("ana@pix"));
-
-
-        
-        Veiculo veiculoAtivo = new Veiculo("ABC1D23", "Fiat Uno", "Prata", 2018, new CategoriaComum());
-        Motorista motorista = new Motorista("Carlos", "22233344455", "senha2", "car@ex.com", "8198888", "CNH-123", veiculoAtivo, StatusMotorista.ONLINE);
-        motorista.setStatus(StatusMotorista.ONLINE);
 
         try {
-            passageiro.checarPodeSolicitarCorrida();;
-            Corrida corrida = new Corrida(passageiro, "Avenida X", "Rua Y", 10.0, new CategoriaComum());
-            System.out.println("Corrida criada: " + corrida);
+            System.out.println("=== SISTEMA DE TESTES DO RIDE SHARING ===\n");
 
-            // atribuir motorista
-            corrida.atribuirMotorista(motorista);
-            System.out.println("Motorista atribuído: " + motorista.getNome());
+            /* ------------------------------------------------------
+               1. Criar lista de motoristas cadastrados no sistema
+            -------------------------------------------------------- */
 
-            // inicía viagem
+            List<Motorista> motoristas = new ArrayList<>();
+            Veiculo v1 = new Veiculo("ABC-1234","Honda Civic", "Branco", 2020, 
+                    new CategoriaComum());
+            Motorista m1 = new Motorista("Carlos Silva", "111.222.333-44", "senha123",
+                    "carlos@email.com", "61999990000", "5421345", v1);
+            m1.setStatus(StatusMotorista.ONLINE);
+
+            motoristas.add(m1);
+
+            Veiculo v2 = new Veiculo("XYZ-0000","Corolla", "Preto", 2023, 
+                    new CategoriaComum());
+            Motorista m2 = new Motorista("Marcos Sena", "999.333.111-22", "senha456",
+                    "marcos@email.com", "61999995555", "1234567", v2);
+            m2.setStatus(StatusMotorista.ONLINE);
+
+            motoristas.add(m2);
+
+
+            System.out.println("[OK] Motoristas cadastrados com sucesso!\n");
+
+
+            /* ------------------------------------------------------
+               2. Criar passageiro
+            -------------------------------------------------------- */
+
+            Passageiro passageiro = new Passageiro("Ana Costa", "555.444.333-22",
+                    "ana@email.com", "61988887777", "senha123");
+
+            System.out.println("[OK] Passageiro cadastrado: " + passageiro.getNome() + "\n");
+
+
+            /* ------------------------------------------------------
+               3. Adicionar formas de pagamento
+            -------------------------------------------------------- */
+
+            MetodoPagamento pix = new Pix("ana@pix.com");
+            MetodoPagamento credito = new CartaoCredito("5555 4444 3333 2222", "Ana Costa", "08/29", "123");
+            MetodoPagamento dinheiro = new Dinheiro();  
+
+            passageiro.adicionarMetodoPagamento(pix);
+            passageiro.adicionarMetodoPagamento(credito);
+            passageiro.adicionarMetodoPagamento(dinheiro);
+
+            System.out.println("[OK] Passageiro adicionou métodos de pagamento.\n");
+
+
+            /* ------------------------------------------------------
+               4. Solicitar corrida
+            -------------------------------------------------------- */
+
+            Corrida corrida = new Corrida(
+                    passageiro,
+                    "UnB ICC Sul",
+                    "Shopping Iguatemi",
+                    12.5,
+                    new CategoriaComum()
+            );
+
+            System.out.println("Corrida solicitada: " + corrida);
+
+
+            /* ------------------------------------------------------
+               5. Atribuir motorista AUTOMATICAMENTE dentro da classe Corrida
+            -------------------------------------------------------- */
+
+            corrida.atribuirMotorista(motoristas);
+
+            System.out.println("[OK] Motorista atribuído automaticamente: "
+                    + corrida.getMotorista().getNome()
+                    + " | Veículo: " + corrida.getMotorista().getVeiculo().getModelo()
+                    + "\n");
+
+
+            /* ------------------------------------------------------
+               6. Iniciar a viagem
+            -------------------------------------------------------- */
+
             corrida.iniciarCorrida();
-            System.out.println("Viagem iniciada: " + corrida);
+            System.out.println("[OK] Viagem iniciada!\n");
 
-            // finaliza viagem
+
+            /* ------------------------------------------------------
+               7. Finalizar a viagem
+            -------------------------------------------------------- */
+
             corrida.finalizarCorrida();
-            System.out.println("Viagem finalizada: " + corrida);
+            System.out.println("[OK] Viagem finalizada!\n");
 
-            // escolha de pagamento pelo passageiro: vamos usar a primeira forma cadastrada
-            MetodoPagamento formaEscolhida = passageiro.getMetodoPagamento(0);
-            corrida.setMetodoPagamento(formaEscolhida);
+
+            /* ------------------------------------------------------
+               8. Processar pagamento
+            -------------------------------------------------------- */
+
+            corrida.setMetodoPagamento(dinheiro);
 
             try {
                 corrida.processarPagamento();
-                System.out.println("Pagamento efetuado com sucesso. Status: " + corrida.getStatus());
-            } catch (SaldoInsuficienteException e) {
-                System.err.println("Saldo insuficiente: " + e.getMessage());
-            } catch (PagamentoRecusadoException e) {
-                System.err.println("Pagamento recusado: " + e.getMessage());
-            } catch (EstadoInvalidoDaCorridaException e) {
-                System.err.println("Estado inválido para pagamento: " + e.getMessage());
+                System.out.println("[OK] Pagamento efetuado com sucesso!\n");
+            }
+            catch (SaldoInsuficienteException | PagamentoRecusadoException e) {
+                System.out.println("[ERRO] Falha no pagamento: " + e.getMessage());
+                System.out.println("Status da corrida: " + corrida.getStatus());
             }
 
-            // avaliações (exemplo)
-            passageiro.avaliarMotorista(motorista, 5);
-            motorista.avaliarPassageiro(passageiro, 5);
 
-            System.out.println("Média motorista: " + motorista.getMediaAvaliacao());
-            System.out.println("Média passageiro: " + passageiro.getMediaAvaliacao());
+            /* ------------------------------------------------------
+               9. Avaliações
+            -------------------------------------------------------- */
 
-        } catch (PassageiroPendenteException e) {
-            System.err.println("Não pode solicitar corrida: " + e.getMessage());
-        } catch (EstadoInvalidoDaCorridaException e) {
-            System.err.println("Estado inválido: " + e.getMessage());
+            passageiro.avaliarMotorista(corrida.getMotorista(), 5);
+            corrida.getMotorista().avaliarPassageiro(passageiro, 5);
+
+            System.out.println("[OK] Avaliações registradas.\n");
+
+
+            /* ------------------------------------------------------
+               10. Exibir estados finais
+            -------------------------------------------------------- */
+
+            System.out.println("=== ESTADO FINAL ===");
+            System.out.println("Status da Corrida: " + corrida.getStatus());
+            System.out.println("Média do Motorista: " + corrida.getMotorista().getMediaAvaliacao());
+            System.out.println("Média do Passageiro: " + passageiro.getMediaAvaliacao());
+
+            System.out.println("\n=== FIM DO TESTE ===");
+
+
         } catch (Exception e) {
+            System.out.println("Erro no fluxo principal: " + e.getMessage());
             e.printStackTrace();
         }
 

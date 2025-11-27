@@ -1,4 +1,6 @@
 package entidades;
+import java.util.List;
+
 import excecoes.EstadoInvalidoDaCorridaException;
 import excecoes.PagamentoRecusadoException;
 import excecoes.SaldoInsuficienteException;
@@ -30,11 +32,29 @@ public class Corrida  {
         this.metodoPagamento = forma;
     }
 
-    public void atribuirMotorista(Motorista motorista) throws EstadoInvalidoDaCorridaException{
+    public Motorista encontrarMotoristaDisponivel(List<Motorista> motoristas) throws EstadoInvalidoDaCorridaException {
+        for (Motorista m : motoristas) {
+            if (m.getStatus() == StatusMotorista.ONLINE && m.getVeiculo().getCategoria().getClass() == this.categoria.getClass()) {
+                this.motorista = m;
+                return motorista;
+            }
+        }
+        throw new EstadoInvalidoDaCorridaException("Nenhum motorista disponível encontrado para a categoria selecionada.");
+    }
+
+    public void atribuirMotorista(List<Motorista> motoristas) throws EstadoInvalidoDaCorridaException{
         if (this.status != StatusCorrida.SOLICITADA) {
             throw new EstadoInvalidoDaCorridaException("Só é possível atribuir um motorista a uma corrida que está SOLICITADA.");
         }
-        this.motorista = motorista;
+        Motorista m = encontrarMotoristaDisponivel(motoristas);
+
+        this.motorista = m;
+        this.status = StatusCorrida.ACEITA;
+
+        try {
+            m.setStatus(StatusMotorista.EM_CORRIDA);
+        } catch (Exception e) {
+        }
         this.status = StatusCorrida.ACEITA;
     }
 

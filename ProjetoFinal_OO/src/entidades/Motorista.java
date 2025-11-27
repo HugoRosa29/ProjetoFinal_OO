@@ -8,11 +8,10 @@ public class Motorista extends Usuario {
     private StatusMotorista status;
     private Veiculo veiculo;
 
-    public Motorista(String nome, String cpf, String senha, String email, String telefone, String cnh, Veiculo veiculo, StatusMotorista status) {
+    public Motorista(String nome, String cpf, String senha, String email, String telefone, String cnh, Veiculo veiculo) {
         super(nome, cpf, senha, email, telefone);
         this.cnh = cnh;
         this.veiculo = veiculo;
-        this.status = status;
     }
 
     public void ficarOnline() throws MotoristaInvalidoException {
