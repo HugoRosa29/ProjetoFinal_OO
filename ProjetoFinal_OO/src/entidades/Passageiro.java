@@ -35,5 +35,8 @@ public class Passageiro extends Usuario{
         return metodosPagamento.get(index);
     }
 
+    public List<MetodoPagamento> getMetodosPagamento() {
+        return metodosPagamento;
+    }
 
 }

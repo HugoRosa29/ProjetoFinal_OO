@@ -33,6 +33,7 @@ public class Motorista extends Usuario {
     }
 
     public StatusMotorista getStatus() {return status;}
+    public void setVeiculo(Veiculo veiculo) {this.veiculo = veiculo;}
     public Veiculo getVeiculo() {return veiculo;}
     public void setStatus(StatusMotorista status) {this.status = status;}
     public String getCnh() {return cnh;}

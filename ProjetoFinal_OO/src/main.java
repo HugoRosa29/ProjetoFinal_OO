@@ -22,7 +22,7 @@ public class Main {
                     new CategoriaComum());
             Motorista m1 = new Motorista("Carlos Silva", "111.222.333-44", "senha123",
                     "carlos@email.com", "61999990000", "5421345", v1);
-            m1.setStatus(StatusMotorista.ONLINE);
+            m1.ficarOnline();
 
             motoristas.add(m1);
 
@@ -30,12 +30,21 @@ public class Main {
                     new CategoriaLuxo());
             Motorista m2 = new Motorista("Marcos Sena", "999.333.111-22", "senha456",
                     "marcos@email.com", "61999995555", "1234567", v2);
-            m2.setStatus(StatusMotorista.ONLINE);
+            m2.ficarOnline();
+            m2.ficarOffline();
 
             motoristas.add(m2);
 
 
             System.out.println("[OK] Motoristas cadastrados com sucesso!\n");
+
+            for (Motorista m : motoristas) {
+                System.out.println("Motorista: " + m.getNome() + " | Veículo: " 
+                        + m.getVeiculo().getModelo() + " | Categoria: " 
+                        + m.getVeiculo().getCategoria().getNome());
+            }
+
+            System.out.println('\n');
 
 
             /* ------------------------------------------------------
@@ -75,7 +84,12 @@ public class Main {
                     new CategoriaLuxo()
             );
 
-            System.out.println("Corrida solicitada: " + corrida);
+            System.out.println("Corrida solicitada: " + corrida
+                  + corrida.getOrigem() + " -> " + corrida.getDestino()
+                    + " | Distância: " + corrida.getDistanciaKm() + " km"
+                    + " | Categoria: " + corrida.getCategoria().getNome()
+                    + " | Preço estimado: R$ " + String.format("%.2f", corrida.getValorEstimado())
+                    + "\n");
 
 
             /* ------------------------------------------------------
@@ -112,7 +126,7 @@ public class Main {
                8. Processar pagamento
             -------------------------------------------------------- */
 
-            corrida.setMetodoPagamento(dinheiro);
+            corrida.setMetodoPagamento(credito); 
 
             try {
                 corrida.processarPagamento();
