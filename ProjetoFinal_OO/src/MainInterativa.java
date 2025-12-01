@@ -104,6 +104,7 @@ public class MainInterativa {
         passageiros.add(p);
 
         System.out.println("Passageiro cadastrado com sucesso!");
+        cadastrarMetodoPagamentoPassageiro();
     }
 
     private static void cadastrarMotorista() {
