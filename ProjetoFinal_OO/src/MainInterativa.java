@@ -14,6 +14,7 @@ public class MainInterativa {
     private static List<Corrida> corridas = new ArrayList<>();
 
     public static void main(String[] args) {
+        carregarDadosTeste();
 
         int opcao = -1;
 
@@ -279,29 +280,60 @@ public class MainInterativa {
         System.out.println("✔ Corrida cancelada com sucesso!");
     }
 
-    private static void processarPagamento() throws Exception {
-        Corrida c = escolherCorrida();
-        if (c == null) return;
+    private static void processarPagamento() throws EstadoInvalidoDaCorridaException {
+    System.out.println("\n=== Processar Pagamento ===");
 
-        Passageiro p = c.getPassageiro();
-
-        System.out.println("\nSelecione método de pagamento:");
-        for (int i = 0; i < p.getMetodosPagamento().size(); i++) {
-            System.out.println(i + " - " + p.getMetodosPagamento().get(i));
-        }
-
-        int mp = Integer.parseInt(sc.nextLine());
-        MetodoPagamento forma = p.getMetodosPagamento().get(mp);
-
-        c.setMetodoPagamento(forma);
-
-        try {
-            c.processarPagamento();
-            System.out.println("✔ Pagamento realizado com sucesso!");
-        } catch (SaldoInsuficienteException | PagamentoRecusadoException e) {
-            System.out.println("❌ Falha no pagamento: " + e.getMessage());
-        }
+    Corrida c = escolherCorrida();
+    if (c == null) {
+        System.out.println("Nenhuma corrida selecionada!");
+        return;
     }
+
+    Passageiro p = c.getPassageiro();
+    if (p == null) {
+        System.out.println("❌ ERRO: A corrida não possui passageiro associado!");
+        return;
+    }
+
+    List<MetodoPagamento> metodos = p.getMetodosPagamento();
+
+    if (metodos == null || metodos.isEmpty()) {
+        System.out.println("❌ O passageiro não possui métodos de pagamento cadastrados!");
+        return;
+    }
+
+    // Listagem
+    System.out.println("\nSelecione método de pagamento:");
+    for (int i = 0; i < metodos.size(); i++) {
+        System.out.println(i + " - " + metodos.get(i));
+    }
+
+    // Escolha com validação
+    System.out.print("Escolha: ");
+    int mp;
+    try {
+        mp = Integer.parseInt(sc.nextLine());
+    } catch (Exception e) {
+        System.out.println("Entrada inválida!");
+        return;
+    }
+
+    if (mp < 0 || mp >= metodos.size()) {
+        System.out.println("Índice inválido!");
+        return;
+    }
+
+    MetodoPagamento forma = metodos.get(mp);
+    c.setMetodoPagamento(forma);
+
+    try {
+        c.processarPagamento();
+        System.out.println("✔ Pagamento realizado com sucesso!");
+    } catch (SaldoInsuficienteException | PagamentoRecusadoException e) {
+        System.out.println("❌ Falha no pagamento: " + e.getMessage());
+    }
+}
+
 
 
     /* =======================================================
@@ -390,20 +422,86 @@ public class MainInterativa {
     private static void listarPassageiros() {
         System.out.println("\n=== Passageiros ===");
         for (Passageiro p : passageiros) {
-            System.out.println(p.getNome());
+            System.out.println(p.getNome() + " | Média de Avalicação: "+ p.getMediaAvaliacao() + " | Métodos de Pagamento: " + p.getMetodosPagamento().get(0));
         }
     }
 
     private static void listarMotoristas() {
         System.out.println("\n=== Motoristas ===");
         for (Motorista m : motoristas) {
-            System.out.println(m.getNome() + " | Status: " + m.getStatus());
+            System.out.println(m.getNome() + " | Status: " + m.getStatus() + " | Média de Avalicação: "+ m.getMediaAvaliacao());
         }
     }
 
     private static void listarCorridas() {
         System.out.println("\n=== Corridas ===");
-        corridas.forEach(System.out::println);
+        for (Corrida c : corridas) {
+            System.out.println(c + " | Passageiro: " + c.getPassageiro().getNome() + " | Motorista: " + c.getMotorista().getNome() + " | Status: " + c.getStatus());
+        }
     }
+
+    private static void carregarDadosTeste() {
+
+    /* =======================================================
+                      PASSAGEIROS DE TESTE
+    ========================================================== */
+
+    Passageiro p1 = new Passageiro("Ana Silva", "11111111111", "ana@email.com",
+            "61988880000", "123");
+    p1.adicionarMetodoPagamento(new servicos.Dinheiro());
+
+    Passageiro p2 = new Passageiro("Bruno Costa", "22222222222", "bruno@email.com",
+            "62999990000", "abc");
+    p2.adicionarMetodoPagamento(new servicos.Pix("bruno@pix.com"));
+
+    Passageiro p3 = new Passageiro("Carla Oliveira", "33333333333", "carla@email.com",
+            "61977773333", "senha1");
+    p3.adicionarMetodoPagamento(new CartaoCredito("5555444433332222", "Visa", "123", "08/28"));
+
+    Passageiro p4 = new Passageiro("Diego Santos", "44444444444", "diego@email.com",
+            "61966662222", "senha2");
+    p4.adicionarMetodoPagamento(new servicos.Pix("diego@pix.com"));
+
+    Passageiro p5 = new Passageiro("Eduarda Lima", "55555555555", "eduarda@email.com",
+            "61955551111", "edu123");
+    p5.adicionarMetodoPagamento(new servicos.Dinheiro());
+
+    Passageiro p6 = new Passageiro("Fernando Gomes", "66666666666", "fernando@email.com",
+            "61944441111", "ferpass");
+    p6.adicionarMetodoPagamento(new CartaoCredito("4444333322221111", "Mastercard", "987", "09/27"));
+
+    passageiros.addAll(Arrays.asList(p1, p2, p3, p4, p5, p6));
+
+
+
+    /* =======================================================
+                      MOTORISTAS DE TESTE
+    ========================================================== */
+
+    Motorista m1 = new Motorista("Carlos Mendes", "77777777777",
+            "carlos@email.com", "61910101010", "321", "12345678900", null);
+    m1.setVeiculo(new Veiculo("ABC-1234", "Onix", "Prata", 2020, new CategoriaComum()));
+
+    Motorista m2 = new Motorista("Daniel Rocha", "88888888888",
+            "daniel@email.com", "61920202020", "456", "98765432100", null);
+    m2.setVeiculo(new Veiculo("XYZ-9876", "Corolla", "Preto", 2022, new CategoriaLuxo()));
+
+    Motorista m3 = new Motorista("Elaine Freitas", "99999999999",
+            "elaine@email.com", "61930303030", "el123", "65498732100", null);
+    m3.setVeiculo(new Veiculo("JKL-4567", "HB20", "Branco", 2019, new CategoriaComum()));
+
+    Motorista m4 = new Motorista("Fabiano Souza", "10101010101",
+            "fabiano@email.com", "61940404040", "fa321", "14725836900", null);
+    m4.setVeiculo(new Veiculo("MNO-7654", "Civic", "Cinza", 2021, new CategoriaLuxo()));
+
+    Motorista m5 = new Motorista("Gabriela Torres", "12121212121",
+            "gabi@email.com", "61950505050", "gtpass", "75315985200", null);
+    m5.setVeiculo(new Veiculo("PQR-1122", "Argo", "Vermelho", 2018, new CategoriaComum()));
+
+    Motorista m6 = new Motorista("Henrique Almeida", "13131313131",
+            "henrique@email.com", "61960606060", "hen123", "85245696300", null);
+    m6.setVeiculo(new Veiculo("STU-9988", "Compass", "Azul", 2023, new CategoriaLuxo()));
+
+    motoristas.addAll(Arrays.asList(m1, m2, m3, m4, m5, m6));
 }
-    
+}    

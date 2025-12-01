@@ -20,6 +20,7 @@ public class Corrida  {
     private double precoEstimado;
 
     public Corrida(Passageiro passageiro, String partida, String destino, double distancia, Categoria categoria) {
+        this.passageiro = passageiro;
         this.categoria = categoria;
         this.distancia = distancia;
         this.partida = partida;
