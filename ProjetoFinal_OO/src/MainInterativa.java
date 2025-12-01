@@ -1,7 +1,6 @@
 import entidades.*;
 import excecoes.*;
-import servicos.CartaoCredito;
-import servicos.MetodoPagamento;
+import servicos.*;
 
 import java.util.*;
 
@@ -13,7 +12,7 @@ public class MainInterativa {
     private static List<Motorista> motoristas = new ArrayList<>();
     private static List<Corrida> corridas = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws EstadoInvalidoDaCorridaException {
         carregarDadosTeste();
 
         int opcao = -1;
@@ -49,7 +48,7 @@ public class MainInterativa {
                     default -> System.out.println("Opção inválida!");
                 }
             } catch (Exception e) {
-                System.out.println("\n❌ ERRO: " + e.getMessage());
+                System.out.println("\n ERRO: " + e.getMessage());
             }
 
             System.out.println("\nPressione ENTER para continuar...");
@@ -126,6 +125,7 @@ public class MainInterativa {
         Motorista m = new Motorista(nome, cpf, email, telefone, senha, cnh, null);
 
         motoristas.add(m);
+        cadastrarVeiculoMotorista();
         System.out.println("Motorista cadastrado com sucesso!");
     }
 
@@ -208,14 +208,13 @@ public class MainInterativa {
 
         System.out.println("1. ONLINE");
         System.out.println("2. OFFLINE");
-        System.out.println("3. EM_CORRIDA");
         System.out.print("Escolha: ");
 
         int op = Integer.parseInt(sc.nextLine());
         StatusMotorista s =
                 (op == 1 ? StatusMotorista.ONLINE
                         : op == 2 ? StatusMotorista.OFFLINE
-                        : StatusMotorista.EM_CORRIDA);
+                        : m.getStatus());
 
         m.setStatus(s);
         System.out.println("Status alterado!");
@@ -232,7 +231,7 @@ public class MainInterativa {
         Passageiro p = escolherPassageiro();
         if (p == null) return;
 
-        System.out.print("Origem: ");
+        System.out.print("Local De Partida: ");
         String origem = sc.nextLine();
         System.out.print("Destino: ");
         String destino = sc.nextLine();
@@ -251,7 +250,7 @@ public class MainInterativa {
 
         corridas.add(corrida);
 
-        System.out.println("\n✔ Corrida solicitada com sucesso!");
+        System.out.println("\nCorrida solicitada com sucesso!");
         System.out.println("Motorista atribuído: " + corrida.getMotorista().getNome());
         System.out.println("Valor estimado: R$ " + corrida.getValorEstimado());
     }
@@ -261,7 +260,7 @@ public class MainInterativa {
         if (c == null) return;
 
         c.iniciarCorrida();
-        System.out.println("✔ Corrida agora está EM ANDAMENTO!");
+        System.out.println("Corrida agora está EM ANDAMENTO!");
     }
 
     private static void finalizarCorrida() throws Exception {
@@ -269,7 +268,7 @@ public class MainInterativa {
         if (c == null) return;
 
         c.finalizarCorrida();
-        System.out.println("✔ Corrida finalizada!");
+        System.out.println("Corrida finalizada!");
     }
 
     private static void cancelarCorrida() throws Exception {
@@ -277,64 +276,60 @@ public class MainInterativa {
         if (c == null) return;
 
         c.cancelar();
-        System.out.println("✔ Corrida cancelada com sucesso!");
+        System.out.println("Corrida cancelada com sucesso!");
     }
 
     private static void processarPagamento() throws EstadoInvalidoDaCorridaException {
-    System.out.println("\n=== Processar Pagamento ===");
+        System.out.println("\n=== Processar Pagamento ===");
 
-    Corrida c = escolherCorrida();
-    if (c == null) {
-        System.out.println("Nenhuma corrida selecionada!");
-        return;
+        Corrida c = escolherCorrida();
+        if (c == null) {
+            System.out.println("Nenhuma corrida selecionada!");
+            return;
+        }
+
+        Passageiro p = c.getPassageiro();
+        if (p == null) {
+            System.out.println("ERRO: A corrida não possui passageiro associado!");
+            return;
+        }
+
+        List<MetodoPagamento> metodos = p.getMetodosPagamento();
+
+        if (metodos == null || metodos.isEmpty()) {
+            System.out.println("O passageiro não possui métodos de pagamento cadastrados!");
+            return;
+        }
+
+        System.out.println("\nSelecione método de pagamento:");
+        for (int i = 0; i < metodos.size(); i++) {
+            System.out.println(i + " - " + metodos.get(i).getTipoPagamento());
+        }
+
+        System.out.print("Escolha: ");
+        int mp;
+        try {
+            mp = Integer.parseInt(sc.nextLine());
+        } catch (Exception e) {
+            System.out.println("Entrada inválida!");
+            return;
+        }
+
+        if (mp < 0 || mp >= metodos.size()) {
+            System.out.println("Índice inválido!");
+            return;
+        }
+
+        MetodoPagamento forma = metodos.get(mp);
+        c.setMetodoPagamento(forma);
+
+        try {
+            c.processarPagamento();
+            System.out.println("Pagamento realizado com sucesso!");
+        } catch (SaldoInsuficienteException | PagamentoRecusadoException e) {
+            System.out.println("Falha no pagamento: " + e.getMessage());
+        }
     }
-
-    Passageiro p = c.getPassageiro();
-    if (p == null) {
-        System.out.println("❌ ERRO: A corrida não possui passageiro associado!");
-        return;
-    }
-
-    List<MetodoPagamento> metodos = p.getMetodosPagamento();
-
-    if (metodos == null || metodos.isEmpty()) {
-        System.out.println("❌ O passageiro não possui métodos de pagamento cadastrados!");
-        return;
-    }
-
-    // Listagem
-    System.out.println("\nSelecione método de pagamento:");
-    for (int i = 0; i < metodos.size(); i++) {
-        System.out.println(i + " - " + metodos.get(i));
-    }
-
-    // Escolha com validação
-    System.out.print("Escolha: ");
-    int mp;
-    try {
-        mp = Integer.parseInt(sc.nextLine());
-    } catch (Exception e) {
-        System.out.println("Entrada inválida!");
-        return;
-    }
-
-    if (mp < 0 || mp >= metodos.size()) {
-        System.out.println("Índice inválido!");
-        return;
-    }
-
-    MetodoPagamento forma = metodos.get(mp);
-    c.setMetodoPagamento(forma);
-
-    try {
-        c.processarPagamento();
-        System.out.println("✔ Pagamento realizado com sucesso!");
-    } catch (SaldoInsuficienteException | PagamentoRecusadoException e) {
-        System.out.println("❌ Falha no pagamento: " + e.getMessage());
-    }
-}
-
-
 
     /* =======================================================
                       AVALIAÇÕES
@@ -344,6 +339,11 @@ public class MainInterativa {
         Corrida c = escolherCorrida();
         if (c == null) return;
 
+        if (c.isMotoristaAvaliado()) {
+            System.out.println("Este motorista já foi avaliado nesta corrida!");
+            return;
+        }
+
         Motorista m = c.getMotorista();
         Passageiro p = c.getPassageiro();
 
@@ -351,12 +351,19 @@ public class MainInterativa {
         int nota = Integer.parseInt(sc.nextLine());
 
         p.avaliarMotorista(m, nota);
-        System.out.println("✔ Motorista avaliado!");
+        c.setMotoristaAvaliado(true);
+
+        System.out.println("Motorista avaliado!");
     }
 
     private static void avaliarPassageiro() {
         Corrida c = escolherCorrida();
         if (c == null) return;
+
+        if (c.isPassageiroAvaliado()) {
+            System.out.println("Este passageiro já foi avaliado nesta corrida!");
+            return;
+        }
 
         Motorista m = c.getMotorista();
         Passageiro p = c.getPassageiro();
@@ -365,7 +372,9 @@ public class MainInterativa {
         int nota = Integer.parseInt(sc.nextLine());
 
         m.avaliarPassageiro(p, nota);
-        System.out.println("✔ Passageiro avaliado!");
+        c.setPassageiroAvaliado(true);
+
+        System.out.println("Passageiro avaliado!");
     }
 
 
@@ -412,7 +421,7 @@ public class MainInterativa {
         System.out.println("\nCorridas:");
         for (int i = 0; i < corridas.size(); i++) {
             Corrida c = corridas.get(i);
-            System.out.println(i + " - " + c);
+            System.out.println(i + " - " + c + " | Passageiro: " + c.getPassageiro().getNome() + " | Motorista: " + c.getMotorista().getNome() + " | Status: " + c.getStatus());
         }
 
         System.out.print("Escolha: ");
@@ -422,7 +431,7 @@ public class MainInterativa {
     private static void listarPassageiros() {
         System.out.println("\n=== Passageiros ===");
         for (Passageiro p : passageiros) {
-            System.out.println(p.getNome() + " | Média de Avalicação: "+ p.getMediaAvaliacao() + " | Métodos de Pagamento: " + p.getMetodosPagamento().get(0));
+            System.out.println(p.getNome() + " | Média de Avalicação: "+ p.getMediaAvaliacao() + " | Método de Pagamento: " + p.getMetodosPagamento().get(0).getTipoPagamento());
         }
     }
 
@@ -440,7 +449,7 @@ public class MainInterativa {
         }
     }
 
-    private static void carregarDadosTeste() {
+    private static void carregarDadosTeste() throws EstadoInvalidoDaCorridaException {
 
     /* =======================================================
                       PASSAGEIROS DE TESTE
@@ -472,8 +481,6 @@ public class MainInterativa {
 
     passageiros.addAll(Arrays.asList(p1, p2, p3, p4, p5, p6));
 
-
-
     /* =======================================================
                       MOTORISTAS DE TESTE
     ========================================================== */
@@ -481,27 +488,54 @@ public class MainInterativa {
     Motorista m1 = new Motorista("Carlos Mendes", "77777777777",
             "carlos@email.com", "61910101010", "321", "12345678900", null);
     m1.setVeiculo(new Veiculo("ABC-1234", "Onix", "Prata", 2020, new CategoriaComum()));
+    m1.setStatus(StatusMotorista.ONLINE);
 
     Motorista m2 = new Motorista("Daniel Rocha", "88888888888",
             "daniel@email.com", "61920202020", "456", "98765432100", null);
     m2.setVeiculo(new Veiculo("XYZ-9876", "Corolla", "Preto", 2022, new CategoriaLuxo()));
+    m2.setStatus(StatusMotorista.ONLINE);
 
     Motorista m3 = new Motorista("Elaine Freitas", "99999999999",
             "elaine@email.com", "61930303030", "el123", "65498732100", null);
     m3.setVeiculo(new Veiculo("JKL-4567", "HB20", "Branco", 2019, new CategoriaComum()));
+    m3.setStatus(StatusMotorista.ONLINE);
 
     Motorista m4 = new Motorista("Fabiano Souza", "10101010101",
             "fabiano@email.com", "61940404040", "fa321", "14725836900", null);
     m4.setVeiculo(new Veiculo("MNO-7654", "Civic", "Cinza", 2021, new CategoriaLuxo()));
+    m4.setStatus(StatusMotorista.ONLINE);
 
     Motorista m5 = new Motorista("Gabriela Torres", "12121212121",
             "gabi@email.com", "61950505050", "gtpass", "75315985200", null);
     m5.setVeiculo(new Veiculo("PQR-1122", "Argo", "Vermelho", 2018, new CategoriaComum()));
+    m5.setStatus(StatusMotorista.ONLINE);
 
     Motorista m6 = new Motorista("Henrique Almeida", "13131313131",
             "henrique@email.com", "61960606060", "hen123", "85245696300", null);
     m6.setVeiculo(new Veiculo("STU-9988", "Compass", "Azul", 2023, new CategoriaLuxo()));
+    m6.setStatus(StatusMotorista.ONLINE);
 
     motoristas.addAll(Arrays.asList(m1, m2, m3, m4, m5, m6));
+    
+    Corrida corr1 = new Corrida(passageiros.get(3), "Taguatinga", "Asa Norte", 22.5, new CategoriaComum());
+    corr1.atribuirMotorista(motoristas);
+    if (corr1.getPassageiro() != null) corridas.add(corr1);
+
+    Corrida corr2 = new Corrida(passageiros.get(5), "Gama", "Setor Bancário Sul", 30.8, new CategoriaLuxo());
+    corr2.atribuirMotorista(motoristas);
+    if (corr2.getPassageiro() != null) corridas.add(corr2);
+
+    Corrida corr3 = new Corrida(passageiros.get(1), "Asa Sul", "Parque da Cidade", 4.3, new CategoriaComum());
+    corr3.atribuirMotorista(motoristas);
+    if (corr3.getPassageiro() != null) corridas.add(corr3);
+
+    Corrida corr4 = new Corrida(passageiros.get(4), "Lago Norte", "Lago Sul", 18.1, new CategoriaLuxo());
+    corr4.atribuirMotorista(motoristas);
+    if (corr4.getPassageiro() != null) corridas.add(corr4);
+
+    Corrida corr5 = new Corrida(passageiros.get(2), "Aeroporto", "Asa Norte", 13.7, new CategoriaComum());
+    corr5.atribuirMotorista(motoristas);
+    if (corr5.getPassageiro() != null) corridas.add(corr5);
+
 }
 }    

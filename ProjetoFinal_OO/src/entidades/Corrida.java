@@ -18,6 +18,8 @@ public class Corrida  {
     private String destino;
     private double distancia;
     private double precoEstimado;
+    private boolean motoristaAvaliado = false;
+    private boolean passageiroAvaliado = false;
 
     public Corrida(Passageiro passageiro, String partida, String destino, double distancia, Categoria categoria) {
         this.passageiro = passageiro;
@@ -117,6 +119,23 @@ public class Corrida  {
         }
         System.out.println("Pagamento de R$" + precoFinal + " processado via " + metodoPagamento.getTipoPagamento() + ".");
     }
+
+    public boolean isMotoristaAvaliado() {
+        return motoristaAvaliado;
+    }
+
+    public void setMotoristaAvaliado(boolean motoristaAvaliado) {
+        this.motoristaAvaliado = motoristaAvaliado;
+    }
+
+    public boolean isPassageiroAvaliado() {
+        return passageiroAvaliado;
+    }
+
+    public void setPassageiroAvaliado(boolean passageiroAvaliado) {
+        this.passageiroAvaliado = passageiroAvaliado;
+    }
+
 
 
     public double getValorEstimado() { return precoEstimado; }
