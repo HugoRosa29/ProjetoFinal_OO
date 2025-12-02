@@ -56,10 +56,6 @@ public class MainInterativa {
         }
     }
 
-    /* =======================================================
-                       MENU PRINCIPAL
-    ========================================================== */
-
     private static void mostrarMenu() {
         System.out.println("\n====== SISTEMA DE RIDE SHARING ======");
         System.out.println("1. Cadastrar Passageiro");
@@ -80,11 +76,6 @@ public class MainInterativa {
         System.out.println("0. Sair");
         System.out.print("Escolha a opção: ");
     }
-
-
-    /* =======================================================
-                       CADASTROS BÁSICOS
-    ========================================================== */
 
     private static void cadastrarPassageiro() {
         System.out.println("\n=== Cadastro de Passageiro ===");
@@ -221,11 +212,6 @@ public class MainInterativa {
         System.out.println("Status alterado!");
     }
 
-
-    /* =======================================================
-                      SOLICITAR / GERENCIAR CORRIDAS
-    ========================================================== */
-
     private static void solicitarCorrida() throws Exception {
         System.out.println("\n=== Solicitar Corrida ===");
 
@@ -253,7 +239,7 @@ public class MainInterativa {
 
         System.out.println("\nCorrida solicitada com sucesso!");
         System.out.println("Motorista atribuído: " + corrida.getMotorista().getNome());
-        System.out.println("Valor estimado: R$ " + corrida.getValorEstimado());
+        System.out.println("Valor estimado: R$ " + corrida.getValor());
     }
 
     private static void iniciarCorrida() throws Exception {
@@ -332,10 +318,6 @@ public class MainInterativa {
         }
     }
 
-    /* =======================================================
-                      AVALIAÇÕES
-    ========================================================== */
-
     private static void avaliarMotorista() {
         Corrida c = escolherCorrida();
         if (c == null) return;
@@ -378,10 +360,6 @@ public class MainInterativa {
         System.out.println("Passageiro avaliado!");
     }
 
-
-    /* =======================================================
-                      MÉTODOS DE APOIO
-    ========================================================== */
 
     private static Passageiro escolherPassageiro() {
         if (passageiros.isEmpty()) {
@@ -452,9 +430,6 @@ public class MainInterativa {
 
     private static void carregarDadosTeste() throws EstadoInvalidoDaCorridaException {
 
-    /* =======================================================
-                      PASSAGEIROS DE TESTE
-    ========================================================== */
 
     Passageiro p1 = new Passageiro("Ana Silva", "11111111111", "ana@email.com",
             "61988880000", "123");
@@ -481,10 +456,6 @@ public class MainInterativa {
     p6.adicionarMetodoPagamento(new CartaoCredito("4444333322221111", "Mastercard", "987", "09/27"));
 
     passageiros.addAll(Arrays.asList(p1, p2, p3, p4, p5, p6));
-
-    /* =======================================================
-                      MOTORISTAS DE TESTE
-    ========================================================== */
 
     Motorista m1 = new Motorista("Carlos Mendes", "77777777777",
             "carlos@email.com", "61910101010", "321", "12345678900", null);
@@ -529,14 +500,6 @@ public class MainInterativa {
     Corrida corr3 = new Corrida(passageiros.get(1), "Asa Sul", "Parque da Cidade", 4.3, new CategoriaComum());
     corr3.atribuirMotorista(motoristas);
     if (corr3.getPassageiro() != null) corridas.add(corr3);
-
-    Corrida corr4 = new Corrida(passageiros.get(4), "Lago Norte", "Lago Sul", 18.1, new CategoriaLuxo());
-    corr4.atribuirMotorista(motoristas);
-    if (corr4.getPassageiro() != null) corridas.add(corr4);
-
-    Corrida corr5 = new Corrida(passageiros.get(2), "Aeroporto", "Asa Norte", 13.7, new CategoriaComum());
-    corr5.atribuirMotorista(motoristas);
-    if (corr5.getPassageiro() != null) corridas.add(corr5);
 
 }
 }    

@@ -17,7 +17,6 @@ public class Corrida  {
     private String partida;
     private String destino;
     private double distancia;
-    private double precoEstimado;
     private boolean motoristaAvaliado = false;
     private boolean passageiroAvaliado = false;
 
@@ -27,7 +26,6 @@ public class Corrida  {
         this.distancia = distancia;
         this.partida = partida;
         this.destino = destino;
-        this.precoEstimado = categoria.calcularPreco(distancia);
         this.status = StatusCorrida.SOLICITADA;
     }
 
@@ -35,30 +33,29 @@ public class Corrida  {
         this.metodoPagamento = forma;
     }
 
-    public Motorista encontrarMotoristaDisponivel(List<Motorista> motoristas) throws EstadoInvalidoDaCorridaException {
+    public void atribuirMotorista(List<Motorista> motoristas) throws EstadoInvalidoDaCorridaException {
+        if (this.status != StatusCorrida.SOLICITADA) {
+            throw new EstadoInvalidoDaCorridaException("Só é possível atribuir motorista a uma corrida SOLICITADA.");
+        }
+
         for (Motorista m : motoristas) {
-            if (m.getStatus() == StatusMotorista.ONLINE && m.getVeiculo().getCategoria().getClass() == this.categoria.getClass()) {
+            if (m.getStatus() != StatusMotorista.ONLINE) {
+                continue; 
+            }
+            boolean aceitou = m.aceitarCorrida(this.categoria);
+
+            if (aceitou) {
                 this.motorista = m;
-                return motorista;
+                this.status = StatusCorrida.ACEITA;
+                
+                m.setStatus(StatusMotorista.EM_CORRIDA); 
+                
+                System.out.println("Corrida aceita pelo motorista: " + m.getNome());
+                return; 
             }
         }
-        throw new EstadoInvalidoDaCorridaException("Nenhum motorista disponível encontrado para a categoria selecionada.");
-    }
 
-    public void atribuirMotorista(List<Motorista> motoristas) throws EstadoInvalidoDaCorridaException{
-        if (this.status != StatusCorrida.SOLICITADA) {
-            throw new EstadoInvalidoDaCorridaException("Só é possível atribuir um motorista a uma corrida que está SOLICITADA.");
-        }
-        Motorista m = encontrarMotoristaDisponivel(motoristas);
-
-        this.motorista = m;
-        this.status = StatusCorrida.ACEITA;
-
-        try {
-            m.setStatus(StatusMotorista.EM_CORRIDA);
-        } catch (Exception e) {
-        }
-        this.status = StatusCorrida.ACEITA;
+        throw new EstadoInvalidoDaCorridaException("Nenhum motorista disponível (ONLINE e livre) foi encontrado.");
     }
 
     public void iniciarCorrida() throws EstadoInvalidoDaCorridaException {
@@ -93,8 +90,8 @@ public class Corrida  {
     }
 
     public void cancelar() throws EstadoInvalidoDaCorridaException {
-        if (this.status == StatusCorrida.FINALIZADA || this.status == StatusCorrida.CANCELADA) {
-            throw new EstadoInvalidoDaCorridaException("Não é possível cancelar uma corrida que já foi FINALIZADA ou CANCELADA.");
+        if (this.status == StatusCorrida.FINALIZADA || this.status == StatusCorrida.EM_ANDAMENTO) {
+            throw new EstadoInvalidoDaCorridaException("Não é possível cancelar uma corrida que já foi FINALIZADA ou EM ANDAMENTO.");
         }
         this.status = StatusCorrida.CANCELADA;
         if (motorista != null){
@@ -112,7 +109,7 @@ public class Corrida  {
             throw new EstadoInvalidoDaCorridaException("Só é possível processar pagamento de uma corrida FINALIZADA.");
         }
         try{
-            metodoPagamento.processarPagamento(precoEstimado, passageiro);
+            metodoPagamento.processarPagamento(precoFinal, passageiro);
         } catch (SaldoInsuficienteException | PagamentoRecusadoException e){
             this.status = StatusCorrida.PENDENTE_PAGAMENTO;
             throw e;
@@ -138,7 +135,6 @@ public class Corrida  {
 
 
 
-    public double getValorEstimado() { return precoEstimado; }
     public Passageiro getPassageiro() { return passageiro; }
     public Motorista getMotorista() { return motorista; }
     public StatusCorrida getStatus() { return status; }
@@ -146,5 +142,6 @@ public class Corrida  {
     public double getDistanciaKm() { return distancia; }
     public String getOrigem() { return partida; }
     public String getDestino() { return destino; }
+    public String getValor() { return String.format("%.2f", precoFinal); }
 
 }

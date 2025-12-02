@@ -28,6 +28,20 @@ public class Motorista extends Usuario {
         this.status = StatusMotorista.OFFLINE;
     }
 
+    public boolean aceitarCorrida(Categoria categoria) {
+        if (this.status != StatusMotorista.ONLINE) {
+            return false;
+        }
+
+        System.out.println("Motorista " + getNome() + " aceitou a solicitação.");
+        return true;
+    }
+
+    public boolean rejeitarCorrida() {
+        System.out.println("Motorista " + getNome() + " rejeitou a solicitação.");
+        return true;
+    }
+
     public void avaliarPassageiro(Passageiro passageiro, int estrelas) {
         passageiro.adicionarAvaliacao(estrelas);
     }
