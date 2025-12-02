@@ -4,7 +4,7 @@ import java.util.List;
 
 public abstract class Usuario {
     private String nome, cpf, senha, email, telefone;
-    private final List<Integer> avaliacoes = new ArrayList<>();
+    private List<Integer> avaliacoes = new ArrayList<>();
 
     public Usuario(String nome, String cpf, String senha, String email, String telefone) {
         this.nome = nome;
