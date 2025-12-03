@@ -26,6 +26,7 @@ public class Corrida  {
         this.distancia = distancia;
         this.partida = partida;
         this.destino = destino;
+        this.precoFinal = categoria.calcularPreco(distancia);
         this.status = StatusCorrida.SOLICITADA;
     }
 
