@@ -9,6 +9,8 @@ import servicos.MetodoPagamento;
 public class Passageiro extends Usuario{
     private List<MetodoPagamento> metodosPagamento = new ArrayList<>();
 
+    public Passageiro() {}
+    
     public Passageiro(String nome, String cpf, String senha, String email, String telefone) {
         super(nome, cpf, senha, email, telefone);
     }

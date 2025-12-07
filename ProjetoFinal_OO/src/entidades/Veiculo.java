@@ -7,6 +7,8 @@ public class Veiculo {
     private int ano;
     private Categoria categoria;
 
+    public Veiculo() {}
+    
     public Veiculo(String placa, String modelo, String cor, int ano, Categoria categoria) {
         this.placa = placa;
         this.modelo = modelo;

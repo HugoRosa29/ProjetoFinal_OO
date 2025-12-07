@@ -20,6 +20,8 @@ public class Corrida  {
     private boolean motoristaAvaliado = false;
     private boolean passageiroAvaliado = false;
 
+    public Corrida() {}
+    
     public Corrida(Passageiro passageiro, String partida, String destino, double distancia, Categoria categoria) {
         this.passageiro = passageiro;
         this.categoria = categoria;

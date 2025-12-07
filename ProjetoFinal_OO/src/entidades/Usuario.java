@@ -6,6 +6,8 @@ public abstract class Usuario {
     private String nome, cpf, senha, email, telefone;
     private List<Integer> avaliacoes = new ArrayList<>();
 
+    public Usuario() {}
+    
     public Usuario(String nome, String cpf, String senha, String email, String telefone) {
         this.nome = nome;
         this.cpf = cpf;
